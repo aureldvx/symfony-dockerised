@@ -39,31 +39,16 @@ db-flush:
 db-fresh: db-flush mig-m
 
 # Load fixtures (add `--group=<name>` to launch specific fixtures)
-db-fake:
-	{{COMPOSE_SYMFONY}} console doctrine:fixtures:load
+seed *arguments:
+	{{COMPOSE_SYMFONY}} console doctrine:fixtures:load {{arguments}}
 
 # Make a migration and migrate automatically
 migration: mig-c mig-m
 
-# Completely recreate database (env=dev)
-seed-dev: db-fresh
-	{{COMPOSE_SYMFONY}} console doctrine:fixtures:load --group=dev
-
-# Completely recreate database (env=prod)
-seed-prod: db-fresh
-	{{COMPOSE_SYMFONY}} console doctrine:fixtures:load --group=prod
-
 # Clear caches
-cc-dev:
-	{{COMPOSE_SYMFONY}} console cache:clear --env=dev
+cc env='dev':
+	{{COMPOSE_SYMFONY}} console cache:clear --env={{env}}
 
-cc-prod:
-	{{COMPOSE_SYMFONY}} console cache:clear --env=prod
-
-cc-test:
-	{{COMPOSE_SYMFONY}} console cache:clear --env=test
-
-cc: cc-dev cc-prod cc-test
 
 # *******************************
 # Tools related
@@ -100,35 +85,35 @@ fixer:
 	{{COMPOSE_PHP}} {{TOOLS_DIR}}/php-cs-fixer/vendor/bin/php-cs-fixer fix
 
 # Launch PHPStan (see https://phpstan.org/)
-stan path='src':
-	{{COMPOSE_PHP}} {{TOOLS_DIR}}/phpstan/vendor/bin/phpstan analyse -c phpstan.neon {{path}}
+stan *paths='src':
+	{{COMPOSE_PHP}} {{TOOLS_DIR}}/phpstan/vendor/bin/phpstan analyse -c phpstan.neon {{paths}}
 
 # Launch PHP Mess Detector (see https://phpmd.org/)
-phpmd path='src/':
-	{{COMPOSE_PHP}} {{TOOLS_DIR}}/phpmd/vendor/bin/phpmd {{path}} text .phpmd.xml
+phpmd *paths='src/':
+	{{COMPOSE_PHP}} {{TOOLS_DIR}}/phpmd/vendor/bin/phpmd {{paths}} text .phpmd.xml
 
 # Launch PHP_CodeSniffer (see https://github.com/squizlabs/PHP_CodeSniffer)
 phpcs:
 	{{COMPOSE_PHP}} {{TOOLS_DIR}}/phpcs/vendor/bin/phpcs -s --standard=phpcs.xml.dist
 
 # Launch PHP_CodeBeautifier (see https://github.com/squizlabs/PHP_CodeSniffer)
-phpcbf +paths='./src ./tests':
+phpcbf *paths='./src ./tests':
 	{{COMPOSE_PHP}} {{TOOLS_DIR}}/phpcs/vendor/bin/phpcbf --standard=phpcs.xml.dist {{paths}}
 
 # Launch PHP Copy/Paste Detector (see https://github.com/sebastianbergmann/phpcpd)
-phpcpd path='src/':
-	{{COMPOSE_PHP}} {{TOOLS_DIR}}/phpcpd/vendor/bin/phpcpd {{path}}
+phpcpd *paths='src/':
+	{{COMPOSE_PHP}} {{TOOLS_DIR}}/phpcpd/vendor/bin/phpcpd {{paths}}
 
 # Launch all linting tools for backend code
 lint-php: phpmd phpcpd phpcs stan fixer phpcbf
 
 # Launch ES Lint in the project
-eslint path='src' *arguments:
-	{{COMPOSE_NPM}} ./node_modules/.bin/eslint {{path}} --fix {{arguments}}
+eslint *arguments='src':
+	{{COMPOSE_NPM}} ./node_modules/.bin/eslint --fix {{arguments}}
 
 # Launch Prettier in the project
-prettier path='src' *arguments:
-	{{COMPOSE_NPM}} ./node_modules/.bin/prettier {{path}} --write {{arguments}}
+prettier *arguments='src':
+	{{COMPOSE_NPM}} ./node_modules/.bin/prettier --write {{arguments}}
 
 
 # *******************************
