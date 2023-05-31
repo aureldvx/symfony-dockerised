@@ -152,7 +152,7 @@ tools-phpcpd:
 
 tools: && tools-phpmd tools-phpcs tools-phpcsfixer tools-phpstan tools-phpcpd
 	{{COMPOSE_PHP}} mkdir -p {{TOOLS_DIR}}
-	{{COMPOSE_PHP}} echo -e {{GITIGNORE_TEMPLATE}} >> .gitignore
+	{{COMPOSE_PHP}} echo -e "{{GITIGNORE_TEMPLATE}}" >> .gitignore
 
 new-symfony:
 	{{COMPOSE_SYMFONY}} new temporary_dir
