@@ -4,7 +4,7 @@ services:
     php:
         build:
             dockerfile: docker/php/Dockerfile
-        container_name: demo_places_backend_php
+        container_name: symfony_docker_php
         networks:
             - default
         restart: unless-stopped
@@ -18,7 +18,7 @@ services:
             dockerfile: docker/php/Dockerfile
         environment:
             COMPOSER_ALLOW_SUPERUSER: 1
-        container_name: demo_places_backend_composer
+        container_name: symfony_docker_composer
         depends_on:
             - php
         entrypoint: composer
@@ -33,7 +33,7 @@ services:
     symfony:
         build:
             dockerfile: docker/php/Dockerfile
-        container_name: demo_places_backend_symfony
+        container_name: symfony_docker_symfony
         depends_on:
             - php
             - database
@@ -49,17 +49,17 @@ services:
     web:
         build:
             dockerfile: docker/php/Dockerfile
-        container_name: demo_places_backend_web
+        container_name: symfony_docker_web
         depends_on:
             - php
             - database
         labels:
             traefik.enable: true
             traefik.docker.network: local_environment_web
-            traefik.http.routers.demo_places_backend_web.tls: true
-            traefik.http.routers.demo_places_backend_web.rule: HostRegexp(`demo-places{ip:(\.[0-9]{3}\.[0-9]{3}\.[0-9]{1}\.[0-9]{2,3})?}.traefik.me`)
-            traefik.http.routers.demo_places_backend_web.tls.domains[0].main: "demo-places.traefik.me"
-            traefik.http.routers.demo_places_backend_web.tls.domains[0].sans: "demo-places-*.traefik.me"
+            traefik.http.routers.symfony_docker_web.tls: true
+            traefik.http.routers.symfony_docker_web.rule: HostRegexp(`symfony-docker{ip:(\.[0-9]{3}\.[0-9]{3}\.[0-9]{1}\.[0-9]{2,3})?}.traefik.me`)
+            traefik.http.routers.symfony_docker_web.tls.domains[0].main: "symfony-docker.traefik.me"
+            traefik.http.routers.symfony_docker_web.tls.domains[0].sans: "symfony-docker-*.traefik.me"
         networks:
             - default
             - local_environment_web
@@ -70,7 +70,7 @@ services:
         working_dir: /var/www/html
 
     database:
-        container_name: demo_places_backend_database
+        container_name: symfony_docker_database
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: example
@@ -84,34 +84,34 @@ services:
             - ~/.gitconfig:/root/.gitconfig:ro
 
     adminer:
-        container_name: demo_places_backend_adminer
+        container_name: symfony_docker_adminer
         depends_on:
             - database
         image: adminer
         labels:
             traefik.enable: true
             traefik.docker.network: local_environment_web
-            traefik.http.routers.demo_places_backend_adminer.tls: true
-            traefik.http.routers.demo_places_backend_adminer.rule: HostRegexp(`database-demo-places{ip:(\.[0-9]{3}\.[0-9]{3}\.[0-9]{1}\.[0-9]{2,3})?}.traefik.me`)
-            traefik.http.routers.demo_places_backend_adminer.tls.domains[0].main: "database-demo-places.traefik.me"
-            traefik.http.routers.demo_places_backend_adminer.tls.domains[0].sans: "database-demo-places-*.traefik.me"
-            traefik.http.services.demo_places_backend_adminer.loadbalancer.server.port: "8080"
+            traefik.http.routers.symfony_docker_adminer.tls: true
+            traefik.http.routers.symfony_docker_adminer.rule: HostRegexp(`database-symfony-docker{ip:(\.[0-9]{3}\.[0-9]{3}\.[0-9]{1}\.[0-9]{2,3})?}.traefik.me`)
+            traefik.http.routers.symfony_docker_adminer.tls.domains[0].main: "database-symfony-docker.traefik.me"
+            traefik.http.routers.symfony_docker_adminer.tls.domains[0].sans: "database-symfony-docker-*.traefik.me"
+            traefik.http.services.symfony_docker_adminer.loadbalancer.server.port: "8080"
         networks:
             - default
             - local_environment_web
         restart: unless-stopped
 
     mailer:
-        container_name: demo_places_backend_mailer
+        container_name: symfony_docker_mailer
         image: maildev/maildev
         labels:
             traefik.enable: true
             traefik.docker.network: local_environment_web
-            traefik.http.routers.demo_places_backend_mailer.tls: true
-            traefik.http.routers.demo_places_backend_mailer.rule: HostRegexp(`mailer-demo-places{ip:(\.[0-9]{3}\.[0-9]{3}\.[0-9]{1}\.[0-9]{2,3})?}.traefik.me`)
-            traefik.http.routers.demo_places_backend_mailer.tls.domains[0].main: "mailer-demo-places.traefik.me"
-            traefik.http.routers.demo_places_backend_mailer.tls.domains[0].sans: "mailer-demo-places-*.traefik.me"
-            traefik.http.services.demo_places_backend_mailer.loadbalancer.server.port: "1080"
+            traefik.http.routers.symfony_docker_mailer.tls: true
+            traefik.http.routers.symfony_docker_mailer.rule: HostRegexp(`mailer-symfony-docker{ip:(\.[0-9]{3}\.[0-9]{3}\.[0-9]{1}\.[0-9]{2,3})?}.traefik.me`)
+            traefik.http.routers.symfony_docker_mailer.tls.domains[0].main: "mailer-symfony-docker.traefik.me"
+            traefik.http.routers.symfony_docker_mailer.tls.domains[0].sans: "mailer-symfony-docker-*.traefik.me"
+            traefik.http.services.symfony_docker_mailer.loadbalancer.server.port: "1080"
         networks:
             - default
             - local_environment_web
